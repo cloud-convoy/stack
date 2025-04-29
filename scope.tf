@@ -28,14 +28,13 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Name    = local.stack.stack_name
-      StackId = "${local.stack.stack_name}-${random_id.stack.b64_url}"
+      StackId = local.stack.id
     }
   }
 }
 
 locals {
-  stack = zipmap(["account", "region", "stack_name"], split("_", terraform.workspace))
+  stack = zipmap(["account", "region", "id"], split("_", terraform.workspace))
 }
 
 data "aws_caller_identity" "this" {}
@@ -45,19 +44,15 @@ data "aws_region" "this" {}
 data "aws_default_tags" "this" {
   lifecycle {
     postcondition {
-      condition     = can(regex("[a-zA-Z][-a-zA-Z0-9]*", self.tags["Name"]))
+      condition     = can(regex("[a-zA-Z][-a-zA-Z0-9]*", self.tags["StackId"]))
       error_message = "Member must satisfy regular expression pattern: [a-zA-Z][-a-zA-Z0-9]*"
     }
   }
 }
 
-resource "random_id" "stack" {
-  byte_length = 8
-}
-
 resource "aws_resourcegroups_group" "stack" {
   description = "Managed by Terraform"
-  name        = local.stack.stack_name
+  name        = "stack-${local.stack.id}"
 
   resource_query {
     type = "TAG_FILTERS_1_0"
@@ -67,7 +62,7 @@ resource "aws_resourcegroups_group" "stack" {
 
       TagFilters = [{
         Key    = "StackId"
-        Values = [data.aws_default_tags.this.tags["StackId"]]
+        Values = [local.stack.id]
       }]
     })
   }
@@ -85,10 +80,10 @@ output "region" {
 
 output "stack_id" {
   description = "The ID of the stack"
-  value       = data.aws_default_tags.this.tags["StackId"]
+  value       = local.stack.id
 }
 
 output "stack_name" {
   description = "The physical stack name"
-  value       = local.stack.stack_name
+  value       = local.stack.id
 }
