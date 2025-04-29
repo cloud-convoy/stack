@@ -9,7 +9,7 @@
 |           specific AWS account and region.                       |
 |                                                                  |
 +------------------------------------------------------------------+
-*/
+ */
 
 terraform {
   backend "s3" {
