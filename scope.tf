@@ -74,17 +74,21 @@ resource "aws_resourcegroups_group" "stack" {
 }
 
 output "account" {
-  value = data.aws_caller_identity.this.id
+  description = "The AWS account into which this stack will be deployed"
+  value       = data.aws_caller_identity.this.id
 }
 
 output "region" {
-  value = data.aws_region.this.name
+  description = "The AWS region into which this stack will be deployed (e.g. us-west-2)"
+  value       = data.aws_region.this.name
 }
 
 output "stack_id" {
-  value = data.aws_default_tags.this.tags["StackId"]
+  description = "The ID of the stack"
+  value       = data.aws_default_tags.this.tags["StackId"]
 }
 
 output "stack_name" {
-  value = local.stack.stack_name
+  description = "The physical stack name"
+  value       = local.stack.stack_name
 }
