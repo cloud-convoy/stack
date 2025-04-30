@@ -41,6 +41,10 @@ provider "aws" {
       StackId = local.stack.id
     })
   }
+
+  ignore_tags {
+    keys = ["ApplicationId"]
+  }
 }
 
 data "aws_caller_identity" "this" {}
