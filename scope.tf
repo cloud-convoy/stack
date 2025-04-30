@@ -22,19 +22,25 @@ terraform {
   }
 }
 
+locals {
+  stack = zipmap(["account", "region", "id"], split("_", terraform.workspace))
+}
+
+variable "tags" {
+  default     = {}
+  description = "Stack tags that will be applied to all the taggable resources and the stack itself"
+  type        = map(string)
+}
+
 provider "aws" {
   allowed_account_ids = [local.stack.account]
   region              = local.stack.region
 
   default_tags {
-    tags = {
+    tags = merge(var.tags, {
       StackId = local.stack.id
-    }
+    })
   }
-}
-
-locals {
-  stack = zipmap(["account", "region", "id"], split("_", terraform.workspace))
 }
 
 data "aws_caller_identity" "this" {}
