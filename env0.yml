@@ -1,0 +1,8 @@
+version: 2
+
+deploy:
+  steps:
+    terraformInit:
+      before:
+        - name: Check if the input is formatted
+          run: terraform fmt -check
