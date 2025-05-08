@@ -13,8 +13,8 @@
 
 terraform {
   backend "s3" {
-    bucket               = "571600864712"
-    dynamodb_table       = "571600864712"
+    bucket               = "cloud-convoy"
+    dynamodb_table       = "cloud-convoy"
     encrypt              = true
     key                  = "terraform.tfstate"
     region               = "us-east-1"
