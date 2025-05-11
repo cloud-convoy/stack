@@ -29,7 +29,16 @@ terraform {
 }
 
 locals {
-  stack = zipmap(["account", "region", "id"], split("_", terraform.workspace))
+  stack = {
+    env = zipmap(["account", "region"], slice(split("_", terraform.workspace), 0, 2))
+    id  = split("_", terraform.workspace)[2]
+  }
+}
+
+variable "description" {
+  default     = "Managed by Terraform"
+  description = "A description of the stack"
+  type        = string
 }
 
 variable "tags" {
@@ -39,12 +48,13 @@ variable "tags" {
 }
 
 provider "aws" {
-  allowed_account_ids = [local.stack.account]
-  region              = local.stack.region
+  allowed_account_ids = [local.stack.env.account]
+  region              = local.stack.env.region
 
   default_tags {
     tags = merge(var.tags, {
-      "stack:Environment" = "aws://${local.stack.account}/${local.stack.region}"
+      "stack:Description" = var.description
+      "stack:Environment" = "aws://${local.stack.env.account}/${local.stack.env.region}"
       "stack:StackId"     = local.stack.id
     })
   }
